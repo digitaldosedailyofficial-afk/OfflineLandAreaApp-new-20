@@ -14,12 +14,14 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
-
 import kotlin.math.abs
 import kotlin.math.ceil
+import kotlin.math.cos
 import kotlin.math.floor
 
 class MainActivity : AppCompatActivity() {
+
+    data class LatLng(val latitude: Double, val longitude: Double)
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val points = mutableListOf<LatLng>()
@@ -133,11 +135,6 @@ class MainActivity : AppCompatActivity() {
     private fun calculateArea(coords: List<LatLng>): Double {
         if (coords.size < 3) return 0.0
 
-        // Using Shoelace formula on latitude/longitude directly is inaccurate because
-        // degrees are not equal distance in meters.
-        // So we convert lat/lng to meters approximately using Haversine projection:
-
-        // Approximate constants for meters per degree latitude/longitude near equator
         val metersPerLat = 111132.92
         val metersPerLon = 111319.49
 
@@ -145,5 +142,14 @@ class MainActivity : AppCompatActivity() {
         for (i in coords.indices) {
             val j = (i + 1) % coords.size
 
-            // convert lat/lng to meters relative to origin (first point)
-            val x1 = (coords[i].longitude - coords[0].longitude) * metersPerLon * kotlin.math.cos(Math.toR
+            val x1 = (coords[i].longitude - coords[0].longitude) * metersPerLon * cos(Math.toRadians(coords[i].latitude))
+            val y1 = (coords[i].latitude - coords[0].latitude) * metersPerLat
+
+            val x2 = (coords[j].longitude - coords[0].longitude) * metersPerLon * cos(Math.toRadians(coords[j].latitude))
+            val y2 = (coords[j].latitude - coords[0].latitude) * metersPerLat
+
+            area += (x1 * y2) - (x2 * y1)
+        }
+        return abs(area / 2.0) // area in square meters
+    }
+}
