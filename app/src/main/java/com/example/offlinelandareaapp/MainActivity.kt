@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import kotlin.math.abs
+import kotlin.math.floor
+import kotlin.math.ceil
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,8 +42,25 @@ class MainActivity : AppCompatActivity() {
             tracking = false
             stopButton.visibility = View.GONE
             startButton.visibility = View.VISIBLE
-            val area = calculateArea(points)
-            resultText.text = "Area: %.2f sq.m".format(area)
+
+            val area = calculateArea(points) // sq.m
+
+            val guntaExact = area / 101.17
+
+            // Custom rounding: if fractional part >= 0.50 round up, else round down
+            val guntaRounded = if ((guntaExact - floor(guntaExact)) >= 0.50) {
+                ceil(guntaExact).toInt()
+            } else {
+                floor(guntaExact).toInt()
+            }
+
+            val resultTextString = if (guntaRounded > 0) {
+                "<b>Area: $guntaRounded guntaa</b> (${area.toInt()} sq.m)"
+            } else {
+                "<b>Area: Less than 1 guntaa</b> (${area.toInt()} sq.m)"
+            }
+
+            resultText.setText(android.text.Html.fromHtml(resultTextString, android.text.Html.FROM_HTML_MODE_LEGACY))
         }
     }
 
@@ -86,9 +105,8 @@ class MainActivity : AppCompatActivity() {
             area += coords[i].latitude * coords[j].longitude
             area -= coords[j].latitude * coords[i].longitude
         }
-        return abs(area / 2.0) * 111320 * 111320 // approx m²
+        return abs(area / 2.0) * 111320 * 111320 // approx square meters
     }
 
-    // Custom LatLng class (no Google Maps needed)
     data class LatLng(val latitude: Double, val longitude: Double)
 }
