@@ -43,6 +43,13 @@
         android:text="Press Start"
         android:paddingTop="20dp"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        android:textColor="#0a0a0aff"
         android:textStyle="bold" />
+
+        <com.google.android.gms.ads.AdView
+    android:id="@+id/adView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    ads:adSize="BANNER"
+    ads:adUnitId="ca-app-pub-2783895180616148/9567381099" />
 </LinearLayout>

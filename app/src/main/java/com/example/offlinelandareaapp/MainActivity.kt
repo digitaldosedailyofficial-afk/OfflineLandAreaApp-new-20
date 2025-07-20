@@ -9,7 +9,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.text.HtmlCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
+
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -20,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val points = mutableListOf<LatLng>()
     private var tracking = false
     private var paused = false
+    private lateinit var adView: AdView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             startButton.visibility = View.GONE
             pauseButton.visibility = View.VISIBLE
             stopButton.visibility = View.VISIBLE
-            resultText.text = "" // Hide "Press Start"
+            resultText.text = "" // Hide previous result or "Press Start"
             startTracking()
         }
 
@@ -55,26 +61,41 @@ class MainActivity : AppCompatActivity() {
             pauseButton.visibility = View.GONE
             startButton.visibility = View.VISIBLE
 
-            val area = calculateArea(points)
+            val area = calculateArea(points) // area in sq.m
+
+            val areaInAcre = area / 4046.86
             val gunthaExact = area / 101.17
+            val gunthaRounded = gunthaExact.toInt()
 
-            val gunthaRounded = if ((gunthaExact - floor(gunthaExact)) >= 0.50) {
-                ceil(gunthaExact).toInt()
+            val displayText = if (areaInAcre < 1) {
+                // Less than 1 acre: show guntha only
+                if (gunthaRounded > 0) {
+                    "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+                } else {
+                    "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+                }
             } else {
-                floor(gunthaExact).toInt()
+                // Area >= 1 acre: show acres and leftover guntha
+                val acresPart = areaInAcre.toInt()
+                val leftoverSqm = area - (acresPart * 4046.86)
+                val leftoverGuntha = (leftoverSqm / 101.17).toInt()
+
+                val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
+                val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
+
+                "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
             }
 
-            val resultTextString = if (gunthaRounded > 0) {
-                "<b>Area: $gunthaRounded Guntha</b> (${area.toInt()} sq.m)"
-            } else {
-                "<b>Area: Less than 1 Guntha</b> (${area.toInt()} sq.m)"
-            }
-
-            resultText.text = android.text.Html.fromHtml(
-                resultTextString,
-                android.text.Html.FROM_HTML_MODE_LEGACY
-            )
+            resultText.text = HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
+
+        // Initialize Mobile Ads SDK
+        MobileAds.initialize(this) {}
+
+        // Load the banner ad
+        adView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
     private fun startTracking() {
@@ -111,15 +132,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun calculateArea(coords: List<LatLng>): Double {
         if (coords.size < 3) return 0.0
-        // Shoelace formula
+
+        // Using Shoelace formula on latitude/longitude directly is inaccurate because
+        // degrees are not equal distance in meters.
+        // So we convert lat/lng to meters approximately using Haversine projection:
+
+        // Approximate constants for meters per degree latitude/longitude near equator
+        val metersPerLat = 111132.92
+        val metersPerLon = 111319.49
+
         var area = 0.0
         for (i in coords.indices) {
             val j = (i + 1) % coords.size
-            area += coords[i].latitude * coords[j].longitude
-            area -= coords[j].latitude * coords[i].longitude
-        }
-        return abs(area / 2.0) * 111320 * 111320
-    }
 
-    data class LatLng(val latitude: Double, val longitude: Double)
-}
+            // convert lat/lng to meters relative to origin (first point)
+            val x1 = (coords[i].longitude - coords[0].longitude) * metersPerLon * kotlin.math.cos(Math.toR
