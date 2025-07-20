@@ -7,31 +7,64 @@ import android.widget.Button
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
-    private var isTracking = false
-    private lateinit var startButton: Button
-    private lateinit var stopButton: Button
-    private lateinit var resultText: TextView
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val points = mutableListOf<LatLng>()
+    private var tracking = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        startButton = findViewById(R.id.startButton)
-        stopButton = findViewById(R.id.stopButton)
-        resultText = findViewById(R.id.resultText)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        val startButton = findViewById<Button>(R.id.startButton)
+        val stopButton = findViewById<Button>(R.id.stopButton)
+        val resultText = findViewById<TextView>(R.id.resultText)
 
         startButton.setOnClickListener {
-            isTracking = true
-            startButton.visibility = Button.GONE
-            stopButton.visibility = Button.VISIBLE
-            resultText.text = "Tracking started..."
+            points.clear()
+            tracking = true
+            startButton.visibility = View.GONE
+            stopButton.visibility = View.VISIBLE
+            startTracking()
         }
 
         stopButton.setOnClickListener {
-            isTracking = false
-            stopButton.visibility = Button.GONE
-            startButton.visibility = Button.VISIBLE
-            resultText.text = "Calculated Area: 0.0 acres"
+            tracking = false
+            stopButton.visibility = View.GONE
+            startButton.visibility = View.VISIBLE
+            val area = calculateArea(points)
+            resultText.text = "Area: $area sq.m"
         }
     }
+
+    private fun startTracking() {
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000).build()
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    if (tracking) {
+                        for (loc in result.locations) {
+                            points.add(LatLng(loc.latitude, loc.longitude))
+                        }
+                    }
+                }
+            },
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun calculateArea(coords: List<LatLng>): Double {
+        if (coords.size < 3) return 0.0
+        // Shoelace formula
+        var area = 0.0
+        for (i in coords.indices) {
+            val j = (i + 1) % coords.size
+            area += coords[i].latitude * coords[j].longitude
+            area -= coords[j].latitude * coords[i].longitude
+        }
+        return abs(area / 2.0) * 111320 * 111320 // approx m²
+    }
 }
+

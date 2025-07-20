@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.offlinelandareaapp">
 
-  <application
-    android:icon="@android:drawable/ic_menu_mylocation"
-    android:roundIcon="@android:drawable/ic_menu_mylocation"
-    android:allowBackup="true"
-    android:label="@string/app_name"
-    android:supportsRtl="true"
-    android:theme="@style/Theme.OfflineLandAreaApp">
-        
+    <!-- Location permissions for GPS -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:roundIcon="@android:drawable/ic_menu_mylocation"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.OfflineLandAreaApp">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -17,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
     </application>
 
 </manifest>
