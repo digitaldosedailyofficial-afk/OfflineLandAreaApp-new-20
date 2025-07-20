@@ -11,14 +11,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import kotlin.math.abs
-import kotlin.math.floor
 import kotlin.math.ceil
+import kotlin.math.floor
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val points = mutableListOf<LatLng>()
     private var tracking = false
+    private var paused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,40 +28,52 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val startButton = findViewById<Button>(R.id.startButton)
+        val pauseButton = findViewById<Button>(R.id.pauseButton)
         val stopButton = findViewById<Button>(R.id.stopButton)
         val resultText = findViewById<TextView>(R.id.resultText)
 
         startButton.setOnClickListener {
             points.clear()
             tracking = true
+            paused = false
             startButton.visibility = View.GONE
+            pauseButton.visibility = View.VISIBLE
             stopButton.visibility = View.VISIBLE
+            resultText.text = "" // Hide "Press Start"
             startTracking()
+        }
+
+        pauseButton.setOnClickListener {
+            paused = !paused
+            pauseButton.text = if (paused) "Resume" else "Pause"
         }
 
         stopButton.setOnClickListener {
             tracking = false
+            paused = false
             stopButton.visibility = View.GONE
+            pauseButton.visibility = View.GONE
             startButton.visibility = View.VISIBLE
 
-            val area = calculateArea(points) // sq.m
+            val area = calculateArea(points)
+            val gunthaExact = area / 101.17
 
-            val guntaExact = area / 101.17
-
-            // Custom rounding: if fractional part >= 0.50 round up, else round down
-            val guntaRounded = if ((guntaExact - floor(guntaExact)) >= 0.50) {
-                ceil(guntaExact).toInt()
+            val gunthaRounded = if ((gunthaExact - floor(gunthaExact)) >= 0.50) {
+                ceil(gunthaExact).toInt()
             } else {
-                floor(guntaExact).toInt()
+                floor(gunthaExact).toInt()
             }
 
-            val resultTextString = if (guntaRounded > 0) {
-                "<b>Area: $guntaRounded guntaa</b> (${area.toInt()} sq.m)"
+            val resultTextString = if (gunthaRounded > 0) {
+                "<b>Area: $gunthaRounded Guntha</b> (${area.toInt()} sq.m)"
             } else {
-                "<b>Area: Less than 1 guntaa</b> (${area.toInt()} sq.m)"
+                "<b>Area: Less than 1 Guntha</b> (${area.toInt()} sq.m)"
             }
 
-            resultText.setText(android.text.Html.fromHtml(resultTextString, android.text.Html.FROM_HTML_MODE_LEGACY))
+            resultText.text = android.text.Html.fromHtml(
+                resultTextString,
+                android.text.Html.FROM_HTML_MODE_LEGACY
+            )
         }
     }
 
@@ -85,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             locationRequest,
             object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
-                    if (tracking) {
+                    if (tracking && !paused) {
                         for (loc in result.locations) {
                             points.add(LatLng(loc.latitude, loc.longitude))
                         }
@@ -105,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             area += coords[i].latitude * coords[j].longitude
             area -= coords[j].latitude * coords[i].longitude
         }
-        return abs(area / 2.0) * 111320 * 111320 // approx square meters
+        return abs(area / 2.0) * 111320 * 111320
     }
 
     data class LatLng(val latitude: Double, val longitude: Double)
