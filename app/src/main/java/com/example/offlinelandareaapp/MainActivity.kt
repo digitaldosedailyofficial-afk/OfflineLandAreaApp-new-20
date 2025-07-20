@@ -1,12 +1,19 @@
-
 package com.example.offlinelandareaapp
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Looper
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.*
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val points = mutableListOf<LatLng>()
     private var tracking = false
@@ -34,12 +41,27 @@ class MainActivity : AppCompatActivity() {
             stopButton.visibility = View.GONE
             startButton.visibility = View.VISIBLE
             val area = calculateArea(points)
-            resultText.text = "Area: $area sq.m"
+            resultText.text = "Area: %.2f sq.m".format(area)
         }
     }
 
     private fun startTracking() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000).build()
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 2000
+        ).build()
+
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+            return
+        }
+
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
             object : LocationCallback() {
@@ -66,5 +88,7 @@ class MainActivity : AppCompatActivity() {
         }
         return abs(area / 2.0) * 111320 * 111320 // approx m²
     }
-}
 
+    // Custom LatLng class (no Google Maps needed)
+    data class LatLng(val latitude: Double, val longitude: Double)
+}
