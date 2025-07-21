@@ -1,27 +1,23 @@
 package com.example.offlinelandareaapp
 
 import android.Manifest
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.content.pm.PackageManager
-import android.graphics.Path
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.text.HtmlCompat
-import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
 import kotlin.math.abs
+import kotlin.math.ceil
 import kotlin.math.cos
+import kotlin.math.floor
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,7 +35,71 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-      // Initialize Mobile Ads SDK
+        val startButton = findViewById<Button>(R.id.startButton)
+        val pauseButton = findViewById<Button>(R.id.pauseButton)
+        val stopButton = findViewById<Button>(R.id.stopButton)
+        val resultText = findViewById<TextView>(R.id.resultText)
+        walkingMsg = findViewById(R.id.walkingMessage)
+
+        startButton.setOnClickListener {
+            points.clear()
+            tracking = true
+            paused = false
+            startButton.visibility = View.GONE
+            pauseButton.visibility = View.VISIBLE
+            stopButton.visibility = View.VISIBLE
+            resultText.text = "" // Hide previous result or "Press Start"
+              walkingMsg.text = "Now you start walking 🚶‍♂️"
+        walkingMsg.visibility = View.VISIBLE
+        Toast.makeText(this, "Now you start walking 🚶‍♂️", Toast.LENGTH_SHORT).show()
+            startTracking()
+        }
+
+        pauseButton.setOnClickListener {
+            paused = !paused
+            pauseButton.text = if (paused) "Resume" else "Pause"
+                    walkingMsg.text = if (paused) "Walking Paused ⏸" else "Now you start walking 🚶‍♂️"
+
+        }
+
+        stopButton.setOnClickListener {
+            tracking = false
+            paused = false
+            stopButton.visibility = View.GONE
+            pauseButton.visibility = View.GONE
+            startButton.visibility = View.VISIBLE
+        walkingMsg.visibility = View.GONE
+        Toast.makeText(this, "Tracking Stopped ❌", Toast.LENGTH_SHORT).show()
+
+            val area = calculateArea(points) // area in sq.m
+
+            val areaInAcre = area / 4046.86
+            val gunthaExact = area / 101.17
+            val gunthaRounded = gunthaExact.toInt()
+
+            val displayText = if (areaInAcre < 1) {
+                // Less than 1 acre: show guntha only
+                if (gunthaRounded > 0) {
+                    "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+                } else {
+                    "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+                }
+            } else {
+                // Area >= 1 acre: show acres and leftover guntha
+                val acresPart = areaInAcre.toInt()
+                val leftoverSqm = area - (acresPart * 4046.86)
+                val leftoverGuntha = (leftoverSqm / 101.17).toInt()
+
+                val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
+                val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
+
+                "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+            }
+
+            resultText.text = HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        }
+
+        // Initialize Mobile Ads SDK
         MobileAds.initialize(this) {}
 
         // Load the banner ad
@@ -80,32 +140,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun calculateAndShowArea() {
-        val area = calculateArea(points) // area in sq.m
-        val areaInAcre = area / 4046.86
-        val gunthaExact = area / 101.17
-        val gunthaRounded = gunthaExact.toInt()
-
-        val displayText = if (areaInAcre < 1) {
-            if (gunthaRounded > 0) {
-                "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-            } else {
-                "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-            }
-        } else {
-            val acresPart = areaInAcre.toInt()
-            val leftoverSqm = area - (acresPart * 4046.86)
-            val leftoverGuntha = (leftoverSqm / 101.17).toInt()
-
-            val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
-            val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
-
-            "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-        }
-
-        Toast.makeText(this, HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY), Toast.LENGTH_LONG).show()
-    }
-
     private fun calculateArea(coords: List<LatLng>): Double {
         if (coords.size < 3) return 0.0
 
@@ -124,8 +158,6 @@ class MainActivity : AppCompatActivity() {
 
             area += (x1 * y2) - (x2 * y1)
         }
-        return abs(area / 2.0)
+        return abs(area / 2.0) // area in square meters
     }
-
-    
 }
