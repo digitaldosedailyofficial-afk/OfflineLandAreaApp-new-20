@@ -1,27 +1,27 @@
 package com.example.offlinelandareaapp
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.pm.PackageManager
+import android.graphics.Path
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.text.HtmlCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
 import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.cos
-import kotlin.math.floor
-import com.airbnb.lottie.LottieAnimationView
-import android.widget.Toast
-import android.widget.FrameLayout
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +32,20 @@ class MainActivity : AppCompatActivity() {
     private var tracking = false
     private var paused = false
     private lateinit var adView: AdView
+
+    // Loader and message
     private lateinit var walkingLoader: WalkingManLoaderController
     private lateinit var walkingMsg: TextView
+
+    // New buttons
+    private lateinit var btnStart: Button
+    private lateinit var btnPause: Button
+    private lateinit var btnResume: Button
+    private lateinit var btnStop: Button
+
+    private lateinit var loaderRoot: FrameLayout
+    private lateinit var squareContainer: FrameLayout
+    private lateinit var manIcon: LottieAnimationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,84 +75,34 @@ class MainActivity : AppCompatActivity() {
 
         // --- button wiring ---
         btnStart.setOnClickListener {
+            points.clear()
+            tracking = true
+            paused = false
             walkingLoader.start()
             walkingMsg.text = "🚶 Now you start walking"
             walkingMsg.visibility = View.VISIBLE
             Toast.makeText(this, "Now you start walking", Toast.LENGTH_SHORT).show()
+            startTracking()
         }
 
         btnPause.setOnClickListener {
             walkingLoader.pause()
+            paused = true
             walkingMsg.text = "⏸ Walking paused"
         }
 
         btnResume.setOnClickListener {
             walkingLoader.resume()
+            paused = false
             walkingMsg.text = "🚶 Resumed walking"
         }
 
         btnStop.setOnClickListener {
             walkingLoader.stop()
             walkingMsg.visibility = View.GONE
-        }
-
-        startButton.setOnClickListener {
-            points.clear()
-            tracking = true
-            paused = false
-            startButton.visibility = View.GONE
-            pauseButton.visibility = View.VISIBLE
-            stopButton.visibility = View.VISIBLE
-            resultText.text = "" // Hide previous result or "Press Start"
-            startTracking()
-
-            walkingMsg.visibility = View.VISIBLE
-            Toast.makeText(this, "🚶 Now you start walking", Toast.LENGTH_SHORT).show()
-        }
-
-        pauseButton.setOnClickListener {
-            paused = !paused
-            pauseButton.text = if (paused) "Resume" else "Pause"
-        }
-
-        
-
-        stopButton.setOnClickListener {
-            walkingMsg.visibility = View.GONE
             tracking = false
             paused = false
-            stopButton.visibility = View.GONE
-            pauseButton.visibility = View.GONE
-            startButton.visibility = View.VISIBLE
-
-            val area = calculateArea(points) // area in sq.m
-
-            val areaInAcre = area / 4046.86
-            val gunthaExact = area / 101.17
-            val gunthaRounded = gunthaExact.toInt()
-
-            val displayText = if (areaInAcre < 1) {
-                                // Less than 1 acre: show guntha only
-                  if (gunthaRounded > 0) {
-                    // Corrected to include parentheses around sq.m value
-                    "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-                } else {
-                    // Corrected to include parentheses around sq.m value
-                    "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-                }
-            } else {
-                // Area >= 1 acre: show acres and leftover guntha
-                val acresPart = areaInAcre.toInt()
-                val leftoverSqm = area - (acresPart * 4046.86)
-                val leftoverGuntha = (leftoverSqm / 101.17).toInt()
-
-                val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
-                val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
-
-                "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
-            }
-
-            resultText.text = HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            calculateAndShowArea()
         }
 
         // Initialize Mobile Ads SDK
@@ -184,6 +146,32 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun calculateAndShowArea() {
+        val area = calculateArea(points) // area in sq.m
+        val areaInAcre = area / 4046.86
+        val gunthaExact = area / 101.17
+        val gunthaRounded = gunthaExact.toInt()
+
+        val displayText = if (areaInAcre < 1) {
+            if (gunthaRounded > 0) {
+                "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+            } else {
+                "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+            }
+        } else {
+            val acresPart = areaInAcre.toInt()
+            val leftoverSqm = area - (acresPart * 4046.86)
+            val leftoverGuntha = (leftoverSqm / 101.17).toInt()
+
+            val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
+            val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
+
+            "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+        }
+
+        Toast.makeText(this, HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY), Toast.LENGTH_LONG).show()
+    }
+
     private fun calculateArea(coords: List<LatLng>): Double {
         if (coords.size < 3) return 0.0
 
@@ -202,12 +190,9 @@ class MainActivity : AppCompatActivity() {
 
             area += (x1 * y2) - (x2 * y1)
         }
-        return abs(area / 2.0) // area in square meters
+        return abs(area / 2.0)
     }
 
-     /**
-     * Simple controller to animate the Lottie view around a square loop overlay.
-     */
     private class WalkingManLoaderController(
         private val root: FrameLayout,
         private val squareContainer: FrameLayout,
@@ -215,8 +200,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         private var animator: ObjectAnimator? = null
         private var isShowing = false
-
-        /** Duration (ms) for one full lap. */
         var lapDurationMs: Long = 2400L
 
         fun start() {
@@ -224,7 +207,6 @@ class MainActivity : AppCompatActivity() {
             isShowing = true
             root.visibility = View.VISIBLE
             manIcon.playAnimation()
-            // wait until laid out
             root.post { startAnimationInternal() }
         }
 
