@@ -18,6 +18,8 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
+import com.airbnb.lottie.LottieAnimationView
+import com.example.offlinelandareaapp.ui.loader.WalkingManLoaderController
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private var tracking = false
     private var paused = false
     private lateinit var adView: AdView
+    private lateinit var walkingLoader: WalkingManLoaderController
+    private lateinit var walkingMsg: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +44,17 @@ class MainActivity : AppCompatActivity() {
         val stopButton = findViewById<Button>(R.id.stopButton)
         val resultText = findViewById<TextView>(R.id.resultText)
 
+         val loaderRoot: FrameLayout = findViewById(R.id.walkingManLoaderRoot)
+        val squareContainer: FrameLayout = findViewById(R.id.walkingSquareContainer)
+        val manIcon: LottieAnimationView = findViewById(R.id.walkingManIcon)
+
+        walkingMsg = findViewById(R.id.walkingMessage)
+        walkingLoader = WalkingManLoaderController(loaderRoot, squareContainer, manIcon)
+
+        findViewById<Button>(R.id.btnStart).setOnClickListener {
+            
+        }
+
         startButton.setOnClickListener {
             points.clear()
             tracking = true
@@ -49,14 +64,29 @@ class MainActivity : AppCompatActivity() {
             stopButton.visibility = View.VISIBLE
             resultText.text = "" // Hide previous result or "Press Start"
             startTracking()
+
+            walkingLoader.start()
+            walkingMsg.visibility = View.VISIBLE
+            Toast.makeText(this, "🚶 Now you start walking", Toast.LENGTH_SHORT).show()
         }
 
         pauseButton.setOnClickListener {
             paused = !paused
             pauseButton.text = if (paused) "Resume" else "Pause"
+
+            if(paused){
+                        walkingLoader.pause()
+            }
+            else{
+                walkingLoader.resume()
+            }
         }
 
+        
+
         stopButton.setOnClickListener {
+              walkingLoader.stop()
+            walkingMsg.visibility = View.GONE
             tracking = false
             paused = false
             stopButton.visibility = View.GONE
