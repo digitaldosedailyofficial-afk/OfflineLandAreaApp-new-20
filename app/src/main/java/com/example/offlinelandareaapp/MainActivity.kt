@@ -19,7 +19,6 @@ import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
 import com.airbnb.lottie.LottieAnimationView
-import com.example.offlinelandareaapp.ui.loader.WalkingManLoaderController
 import android.widget.Toast
 import android.widget.FrameLayout
 
@@ -42,20 +41,47 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        val startButton = findViewById<Button>(R.id.startButton)
-        val pauseButton = findViewById<Button>(R.id.pauseButton)
-        val stopButton = findViewById<Button>(R.id.stopButton)
-        val resultText = findViewById<TextView>(R.id.resultText)
-
-         val loaderRoot: FrameLayout = findViewById(R.id.walkingManLoaderRoot)
-        val squareContainer: FrameLayout = findViewById(R.id.walkingSquareContainer)
-        val manIcon: LottieAnimationView = findViewById(R.id.walkingManIcon)
-
+        // --- findViews ---
         walkingMsg = findViewById(R.id.walkingMessage)
-        walkingLoader = WalkingManLoaderController(loaderRoot, squareContainer, manIcon)
+        btnStart = findViewById(R.id.btnStart)
+        btnPause = findViewById(R.id.btnPause)
+        btnResume = findViewById(R.id.btnResume)
+        btnStop = findViewById(R.id.btnStop)
 
-        findViewById<Button>(R.id.btnStart).setOnClickListener {
-            
+        loaderRoot = findViewById(R.id.walkingManLoaderRoot)
+        squareContainer = findViewById(R.id.walkingSquareContainer)
+        manIcon = findViewById(R.id.walkingManIcon)
+
+        // --- init loader ---
+        walkingLoader = WalkingManLoaderController(
+            root = loaderRoot,
+            squareContainer = squareContainer,
+            manIcon = manIcon
+        ).apply {
+            lapDurationMs = 3000L
+        }
+
+        // --- button wiring ---
+        btnStart.setOnClickListener {
+            walkingLoader.start()
+            walkingMsg.text = "🚶 Now you start walking"
+            walkingMsg.visibility = View.VISIBLE
+            Toast.makeText(this, "Now you start walking", Toast.LENGTH_SHORT).show()
+        }
+
+        btnPause.setOnClickListener {
+            walkingLoader.pause()
+            walkingMsg.text = "⏸ Walking paused"
+        }
+
+        btnResume.setOnClickListener {
+            walkingLoader.resume()
+            walkingMsg.text = "🚶 Resumed walking"
+        }
+
+        btnStop.setOnClickListener {
+            walkingLoader.stop()
+            walkingMsg.visibility = View.GONE
         }
 
         startButton.setOnClickListener {
@@ -68,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             resultText.text = "" // Hide previous result or "Press Start"
             startTracking()
 
-            walkingLoader.start()
             walkingMsg.visibility = View.VISIBLE
             Toast.makeText(this, "🚶 Now you start walking", Toast.LENGTH_SHORT).show()
         }
@@ -76,19 +101,11 @@ class MainActivity : AppCompatActivity() {
         pauseButton.setOnClickListener {
             paused = !paused
             pauseButton.text = if (paused) "Resume" else "Pause"
-
-            if(paused){
-                        walkingLoader.pause()
-            }
-            else{
-                walkingLoader.resume()
-            }
         }
 
         
 
         stopButton.setOnClickListener {
-              walkingLoader.stop()
             walkingMsg.visibility = View.GONE
             tracking = false
             paused = false
@@ -186,5 +203,71 @@ class MainActivity : AppCompatActivity() {
             area += (x1 * y2) - (x2 * y1)
         }
         return abs(area / 2.0) // area in square meters
+    }
+
+     /**
+     * Simple controller to animate the Lottie view around a square loop overlay.
+     */
+    private class WalkingManLoaderController(
+        private val root: FrameLayout,
+        private val squareContainer: FrameLayout,
+        private val manIcon: LottieAnimationView
+    ) {
+        private var animator: ObjectAnimator? = null
+        private var isShowing = false
+
+        /** Duration (ms) for one full lap. */
+        var lapDurationMs: Long = 2400L
+
+        fun start() {
+            if (isShowing) return
+            isShowing = true
+            root.visibility = View.VISIBLE
+            manIcon.playAnimation()
+            // wait until laid out
+            root.post { startAnimationInternal() }
+        }
+
+        fun pause() {
+            animator?.pause()
+            manIcon.pauseAnimation()
+        }
+
+        fun resume() {
+            animator?.resume()
+            manIcon.resumeAnimation()
+        }
+
+        fun stop() {
+            animator?.cancel()
+            animator = null
+            manIcon.cancelAnimation()
+            root.visibility = View.GONE
+            isShowing = false
+        }
+
+        private fun startAnimationInternal() {
+            val w = squareContainer.width.toFloat()
+            val h = squareContainer.height.toFloat()
+            if (w == 0f || h == 0f) return
+
+            manIcon.translationX = 0f
+            manIcon.translationY = 0f
+
+            val path = Path().apply {
+                moveTo(0f, 0f)
+                lineTo(w, 0f)
+                lineTo(w, h)
+                lineTo(0f, h)
+                lineTo(0f, 0f)
+            }
+
+            animator = ObjectAnimator.ofFloat(manIcon, View.X, View.Y, path).apply {
+                duration = lapDurationMs
+                repeatCount = ValueAnimator.INFINITE
+                repeatMode = ValueAnimator.RESTART
+                start()
+            }
+        }
     }
 }
