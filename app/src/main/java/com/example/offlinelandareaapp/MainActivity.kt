@@ -33,20 +33,6 @@ class MainActivity : AppCompatActivity() {
     private var paused = false
     private lateinit var adView: AdView
 
-    // Loader and message
-    private lateinit var walkingLoader: WalkingManLoaderController
-    private lateinit var walkingMsg: TextView
-
-    // New buttons
-    private lateinit var btnStart: Button
-    private lateinit var btnPause: Button
-    private lateinit var btnResume: Button
-    private lateinit var btnStop: Button
-
-    private lateinit var loaderRoot: FrameLayout
-    private lateinit var squareContainer: FrameLayout
-    private lateinit var manIcon: LottieAnimationView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
