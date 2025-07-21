@@ -70,10 +70,12 @@ class MainActivity : AppCompatActivity() {
             val gunthaRounded = gunthaExact.toInt()
 
             val displayText = if (areaInAcre < 1) {
-                // Less than 1 acre: show guntha only
-                if (gunthaRounded > 0) {
+                                // Less than 1 acre: show guntha only
+                  if (gunthaRounded > 0) {
+                    // Corrected to include parentheses around sq.m value
                     "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
                 } else {
+                    // Corrected to include parentheses around sq.m value
                     "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
                 }
             } else {
