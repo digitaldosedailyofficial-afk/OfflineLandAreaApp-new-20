@@ -1,57 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/background_land">
 
-    <!-- Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center">
+        android:text="Start"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF" />
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start" />
-
-        <Button
-            android:id="@+id/btnPause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pause"
-            android:layout_marginStart="8dp"/>
-
-        <Button
-            android:id="@+id/btnResume"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Resume"
-            android:layout_marginStart="8dp"/>
-
-        <Button
-            android:id="@+id/btnStop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stop"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
-
-    <!-- AdView (Google AdMob Banner) -->
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btnPause"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-2783895180616148/9567381099" />
+        android:text="Pause"
+        android:visibility="gone"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#FF9800"
+        android:textColor="#FFFFFF" />
 
-<TextView
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:visibility="gone"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="#F44336"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/resultText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Press Start"
+        android:paddingTop="20dp"
+        android:textSize="18sp"
+        android:textColor="#0a0a0aff"
+        android:textStyle="bold" />
+
+        <com.google.android.gms.ads.AdView
+    android:id="@+id/adView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    ads:adSize="BANNER"
+    ads:adUnitId="ca-app-pub-2783895180616148/9567381099" />
+
+    <TextView
     android:id="@+id/walkingMessage"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -62,5 +66,4 @@
     android:visibility="gone"
     android:layout_marginTop="16dp"
     android:padding="8dp"/>
-
-</FrameLayout>
+</LinearLayout>
