@@ -53,59 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // --- findViews ---
-        walkingMsg = findViewById(R.id.walkingMessage)
-        btnStart = findViewById(R.id.btnStart)
-        btnPause = findViewById(R.id.btnPause)
-        btnResume = findViewById(R.id.btnResume)
-        btnStop = findViewById(R.id.btnStop)
-
-        loaderRoot = findViewById(R.id.walkingManLoaderRoot)
-        squareContainer = findViewById(R.id.walkingSquareContainer)
-        manIcon = findViewById(R.id.walkingManIcon)
-
-        // --- init loader ---
-        walkingLoader = WalkingManLoaderController(
-            root = loaderRoot,
-            squareContainer = squareContainer,
-            manIcon = manIcon
-        ).apply {
-            lapDurationMs = 3000L
-        }
-
-        // --- button wiring ---
-        btnStart.setOnClickListener {
-            points.clear()
-            tracking = true
-            paused = false
-            walkingLoader.start()
-            walkingMsg.text = "🚶 Now you start walking"
-            walkingMsg.visibility = View.VISIBLE
-            Toast.makeText(this, "Now you start walking", Toast.LENGTH_SHORT).show()
-            startTracking()
-        }
-
-        btnPause.setOnClickListener {
-            walkingLoader.pause()
-            paused = true
-            walkingMsg.text = "⏸ Walking paused"
-        }
-
-        btnResume.setOnClickListener {
-            walkingLoader.resume()
-            paused = false
-            walkingMsg.text = "🚶 Resumed walking"
-        }
-
-        btnStop.setOnClickListener {
-            walkingLoader.stop()
-            walkingMsg.visibility = View.GONE
-            tracking = false
-            paused = false
-            calculateAndShowArea()
-        }
-
-        // Initialize Mobile Ads SDK
+      // Initialize Mobile Ads SDK
         MobileAds.initialize(this) {}
 
         // Load the banner ad
@@ -193,63 +141,5 @@ class MainActivity : AppCompatActivity() {
         return abs(area / 2.0)
     }
 
-    private class WalkingManLoaderController(
-        private val root: FrameLayout,
-        private val squareContainer: FrameLayout,
-        private val manIcon: LottieAnimationView
-    ) {
-        private var animator: ObjectAnimator? = null
-        private var isShowing = false
-        var lapDurationMs: Long = 2400L
-
-        fun start() {
-            if (isShowing) return
-            isShowing = true
-            root.visibility = View.VISIBLE
-            manIcon.playAnimation()
-            root.post { startAnimationInternal() }
-        }
-
-        fun pause() {
-            animator?.pause()
-            manIcon.pauseAnimation()
-        }
-
-        fun resume() {
-            animator?.resume()
-            manIcon.resumeAnimation()
-        }
-
-        fun stop() {
-            animator?.cancel()
-            animator = null
-            manIcon.cancelAnimation()
-            root.visibility = View.GONE
-            isShowing = false
-        }
-
-        private fun startAnimationInternal() {
-            val w = squareContainer.width.toFloat()
-            val h = squareContainer.height.toFloat()
-            if (w == 0f || h == 0f) return
-
-            manIcon.translationX = 0f
-            manIcon.translationY = 0f
-
-            val path = Path().apply {
-                moveTo(0f, 0f)
-                lineTo(w, 0f)
-                lineTo(w, h)
-                lineTo(0f, h)
-                lineTo(0f, 0f)
-            }
-
-            animator = ObjectAnimator.ofFloat(manIcon, View.X, View.Y, path).apply {
-                duration = lapDurationMs
-                repeatCount = ValueAnimator.INFINITE
-                repeatMode = ValueAnimator.RESTART
-                start()
-            }
-        }
-    }
+    
 }

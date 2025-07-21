@@ -51,48 +51,5 @@
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-2783895180616148/9567381099" />
 
-    <!-- Walking message -->
-    <TextView
-        android:id="@+id/walkingMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🚶 Now you start walking"
-        android:textSize="18sp"
-        android:textColor="@android:color/white"
-        android:background="#AA000000"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_marginTop="16dp" />
-
-    <!-- Loader Overlay -->
-    <FrameLayout
-        android:id="@+id/walkingManLoaderRoot"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="#66000000">
-
-        <FrameLayout
-            android:id="@+id/walkingSquareContainer"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center">
-
-            <View
-                android:id="@+id/walkingSquareBorder"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/white" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/walkingManIcon"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                app:lottie_rawRes="@raw/walking_man"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true" />
-        </FrameLayout>
-    </FrameLayout>
 
 </FrameLayout>
