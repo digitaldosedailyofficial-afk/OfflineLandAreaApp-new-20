@@ -23,10 +23,15 @@
             </intent-filter>
         </activity>
 
+        <!--
+            The Google Mobile Ads SDK application ID.
+            This meta-data tag must be placed inside the <application> tag.
+            Replace "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy" with your actual AdMob App ID.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2783895180616148~3987751356"/>
+
     </application>
-    <meta-data
-        android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-2783895180616148~3987751356"/>
 
 </manifest>
-
