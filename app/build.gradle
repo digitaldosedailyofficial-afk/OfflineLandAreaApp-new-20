@@ -46,4 +46,7 @@ dependencies {
 
     // Google Maps Utils for LatLng
     implementation 'com.google.maps.android:android-maps-utils:3.8.2'
+
+    implementation "com.airbnb.android:lottie:6.1.0"
+
 }

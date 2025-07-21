@@ -20,6 +20,8 @@ import kotlin.math.cos
 import kotlin.math.floor
 import com.airbnb.lottie.LottieAnimationView
 import com.example.offlinelandareaapp.ui.loader.WalkingManLoaderController
+import android.widget.Toast
+
 
 class MainActivity : AppCompatActivity() {
 
