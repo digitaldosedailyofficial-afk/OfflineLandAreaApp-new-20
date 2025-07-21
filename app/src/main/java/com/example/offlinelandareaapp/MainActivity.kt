@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var btnStart: Button
     private lateinit var btnPause: Button
+    private lateinit var btnResume: Button
     private lateinit var btnStop: Button
     private lateinit var walkingMsg: TextView
 
@@ -42,36 +43,36 @@ class MainActivity : AppCompatActivity() {
         // Initialize Views
         btnStart = findViewById(R.id.btnStart)
         btnPause = findViewById(R.id.btnPause)
+        btnResume = findViewById(R.id.btnResume)
         btnStop = findViewById(R.id.btnStop)
         walkingMsg = findViewById(R.id.walkingMessage)
 
-        // Start Button Click
+        // Button: Start
         btnStart.setOnClickListener {
+            tracking = true
+            paused = false
             walkingMsg.text = "Now you start walking 🚶‍♂️"
             walkingMsg.visibility = View.VISIBLE
-            btnStart.visibility = View.GONE
-            btnPause.visibility = View.VISIBLE
-            btnStop.visibility = View.VISIBLE
             Toast.makeText(this, "Now you start walking 🚶‍♂️", Toast.LENGTH_SHORT).show()
             startTracking()
         }
 
-        // Pause Button Click
+        // Button: Pause
         btnPause.setOnClickListener {
-            paused = !paused
-            btnPause.text = if (paused) "Resume" else "Pause"
-            walkingMsg.text = if (paused) "Walking Paused ⏸" else "Now you start walking 🚶‍♂️"
+            paused = true
+            walkingMsg.text = "Walking Paused ⏸"
         }
 
-        // Stop Button Click
+        // Button: Resume
+        btnResume.setOnClickListener {
+            paused = false
+            walkingMsg.text = "Now you start walking 🚶‍♂️"
+        }
+
+        // Button: Stop
         btnStop.setOnClickListener {
             tracking = false
-            paused = false
             walkingMsg.visibility = View.GONE
-            btnPause.visibility = View.GONE
-            btnStop.visibility = View.GONE
-            btnStart.visibility = View.VISIBLE
-            Toast.makeText(this, "Tracking Stopped ❌", Toast.LENGTH_SHORT).show()
             calculateAndShowArea()
         }
 
@@ -115,24 +116,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun calculateAndShowArea() {
-        val area = calculateArea(points)
+        val area = calculateArea(points) // area in sq.m
+        val areaInAcre = area / 4046.86
         val gunthaExact = area / 101.17
         val gunthaRounded = gunthaExact.toInt()
-        val displayText = "<b>Area: $gunthaRounded Guntha</b> (${area.toInt()} sq.m)"
+
+        val displayText = if (areaInAcre < 1) {
+            if (gunthaRounded > 0) {
+                "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+            } else {
+                "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+            }
+        } else {
+            val acresPart = areaInAcre.toInt()
+            val leftoverSqm = area - (acresPart * 4046.86)
+            val leftoverGuntha = (leftoverSqm / 101.17).toInt()
+
+            val acreText = if (acresPart == 1) "1 acre" else "$acresPart acres"
+            val gunthaText = if (leftoverGuntha > 0) " $leftoverGuntha Guntha" else ""
+
+            "<b><font color='black'>Area: $acreText$gunthaText</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
+        }
+
         Toast.makeText(this, HtmlCompat.fromHtml(displayText, HtmlCompat.FROM_HTML_MODE_LEGACY), Toast.LENGTH_LONG).show()
     }
 
     private fun calculateArea(coords: List<LatLng>): Double {
         if (coords.size < 3) return 0.0
+
         val metersPerLat = 111132.92
         val metersPerLon = 111319.49
+
         var area = 0.0
         for (i in coords.indices) {
             val j = (i + 1) % coords.size
+
             val x1 = (coords[i].longitude - coords[0].longitude) * metersPerLon * cos(Math.toRadians(coords[i].latitude))
             val y1 = (coords[i].latitude - coords[0].latitude) * metersPerLat
+
             val x2 = (coords[j].longitude - coords[0].longitude) * metersPerLon * cos(Math.toRadians(coords[j].latitude))
             val y2 = (coords[j].latitude - coords[0].latitude) * metersPerLat
+
             area += (x1 * y2) - (x2 * y1)
         }
         return abs(area / 2.0)
