@@ -93,7 +93,10 @@
         android:gravity="center"
         android:layout_marginHorizontal="24dp"
         android:lineSpacingExtra="4dp"
-        android:layout_marginBottom="60dp" /> <!-- Adjusted margin to avoid overlap with AdView -->
+        android:layout_marginBottom="60dp"
+        android:singleLine="true"   
+        android:ellipsize="end"     
+        />
 
     <!-- AdView (Google AdMob Banner) -->
     <com.google.android.gms.ads.AdView
