@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.offlinelandareaapp'
+    namespace 'com.abhipatil.offlinelandareaapp'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.offlinelandareaapp"
+        applicationId "com.abhipatil.offlinelandareaapp"
         minSdk 21
         targetSdk 34
         versionCode 1
