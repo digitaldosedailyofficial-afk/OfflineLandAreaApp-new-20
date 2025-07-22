@@ -14,7 +14,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/background_land" />
 
-    <!-- Main content -->
+    <!-- Main content - Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,28 +27,39 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start" />
+            android:text="Start"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF" />
 
         <Button
             android:id="@+id/btnPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pause"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            android:backgroundTint="#FF9800"
+            android:textColor="#FFFFFF" />
 
         <Button
             android:id="@+id/btnResume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Resume"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF" />
 
         <Button
             android:id="@+id/btnStop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Stop"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            android:backgroundTint="#F44336"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <!-- Walking message -->
@@ -64,6 +75,25 @@
         android:visibility="gone"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginTop="80dp" />
+
+    <!-- Result Text - For displaying calculated area -->
+    <TextView
+        android:id="@+id/resultText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Press Start to measure area"
+        android:padding="16dp"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="#DDFFFFFF"
+        android:elevation="4dp"
+        android:visibility="visible"
+        android:gravity="center"
+        android:layout_marginHorizontal="24dp"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="60dp" /> <!-- Adjusted margin to avoid overlap with AdView -->
 
     <!-- AdView (Google AdMob Banner) -->
     <com.google.android.gms.ads.AdView
