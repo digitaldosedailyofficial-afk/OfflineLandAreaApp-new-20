@@ -1,7 +1,9 @@
 package com.example.offlinelandareaapp
 
 import android.Manifest
+import android.content.Context // Import Context for LocationManager
 import android.content.pm.PackageManager
+import android.location.LocationManager // Import LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log // Import Log for debugging
@@ -20,6 +22,8 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
 import kotlin.math.abs
 import kotlin.math.cos
+import android.os.Handler // Import Handler
+import android.content.Intent // Import Intent for settings
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         resultText = findViewById(R.id.resultText) // Initialize the new TextView
 
         // Set initial UI state
+        // Set initial text for resultText here, not in updateButtonVisibility
+        resultText.text = "Press Start to measure area"
         updateButtonVisibility()
 
         // Button: Start Tracking
@@ -73,12 +79,19 @@ class MainActivity : AppCompatActivity() {
             points.clear() // Clear previous points for a new measurement
             tracking = true
             paused = false
-            walkingMsg.text = "Now you start walking 🚶‍♂️"
+            walkingMsg.text = "Now you start walking 🚶‍♂️" // Initial text with symbol
             walkingMsg.visibility = View.VISIBLE
             resultText.visibility = View.GONE // Hide result text when tracking starts
             Toast.makeText(this, "Now you start walking 🚶‍♂️", Toast.LENGTH_SHORT).show()
             updateButtonVisibility()
-            startTracking()
+            startTracking() // This will now include the location service check
+
+            // Hide "Now you start walking" text after 5 seconds, leaving only the symbol
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (tracking && !paused) { // Only change if still tracking and not paused
+                    walkingMsg.text = "🚶‍♂️"
+                }
+            }, 5000) // 5000 milliseconds = 5 seconds
         }
 
         // Button: Pause Tracking
@@ -95,6 +108,12 @@ class MainActivity : AppCompatActivity() {
             walkingMsg.text = "Now you start walking 🚶‍♂️"
             Toast.makeText(this, "Tracking Resumed", Toast.LENGTH_SHORT).show()
             updateButtonVisibility()
+            // If resuming, and the text was previously hidden, show the full text again briefly
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (tracking && !paused) {
+                    walkingMsg.text = "🚶‍♂️"
+                }
+            }, 5000)
         }
 
         // Button: Stop Tracking
@@ -104,8 +123,8 @@ class MainActivity : AppCompatActivity() {
             walkingMsg.visibility = View.GONE
             Toast.makeText(this, "Tracking Stopped. Calculating Area...", Toast.LENGTH_SHORT).show()
             stopTracking() // Stop location updates
-            calculateAndShowArea()
-            updateButtonVisibility()
+            calculateAndShowArea() // Calculate and display the area
+            updateButtonVisibility() // Update button visibility after calculation
         }
 
         // Initialize Mobile Ads SDK
@@ -164,10 +183,8 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, start tracking if it was requested
-                if (tracking) {
-                    startTracking()
-                }
+                // Permission granted, now check if location services are enabled
+                checkLocationServicesAndStartTracking()
                 Toast.makeText(this, "Location permission granted.", Toast.LENGTH_SHORT).show()
             } else {
                 // Permission denied
@@ -181,13 +198,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // New function to check if location services are enabled
+    private fun checkLocationServicesAndStartTracking() {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        if (!isGpsEnabled && !isNetworkEnabled) {
+            // Location services are disabled
+            Toast.makeText(this, "Please enable location services (GPS) in your device settings to track area.", Toast.LENGTH_LONG).show()
+            // Optionally, you can prompt the user to go to settings
+            // val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            // startActivity(intent)
+            // Reset tracking state if location services are not enabled
+            tracking = false
+            paused = false
+            updateButtonVisibility()
+            walkingMsg.visibility = View.GONE
+        } else {
+            // Location services are enabled, proceed to start tracking
+            if (tracking) { // Only start if tracking was intended to be true
+                startLocationUpdates()
+            }
+        }
+    }
+
+
     // Starts receiving location updates
     private fun startTracking() {
-        val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 2000 // Update every 2 seconds
-        ).build()
-
-        // Check for permissions before requesting updates
+        // First, check for permissions
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
@@ -201,6 +240,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Permissions are granted, now check if location services are enabled
+        checkLocationServicesAndStartTracking()
+    }
+
+    // Renamed from startTracking to startLocationUpdates to avoid confusion with the permission/service check
+    private fun startLocationUpdates() {
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 2000 // Update every 2 seconds
+        ).build()
+
         // Request location updates
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
@@ -209,6 +258,7 @@ class MainActivity : AppCompatActivity() {
         )
         Log.d("LocationTracker", "Location tracking started.")
     }
+
 
     // Stops receiving location updates
     private fun stopTracking() {
@@ -282,13 +332,13 @@ class MainActivity : AppCompatActivity() {
                 btnPause.visibility = View.VISIBLE
                 btnResume.visibility = View.GONE
             }
-        } else {
+        } else { // When not tracking (initial state or after stop)
             btnStart.visibility = View.VISIBLE
             btnPause.visibility = View.GONE
             btnResume.visibility = View.GONE
             btnStop.visibility = View.GONE
-            resultText.visibility = View.VISIBLE // Show result text when not tracking
-            resultText.text = "Press Start to measure area" // Reset text
+            // Do NOT reset resultText.text here. calculateAndShowArea() handles it.
+            // resultText.visibility is also handled by calculateAndShowArea() or initial setup.
         }
     }
 }
