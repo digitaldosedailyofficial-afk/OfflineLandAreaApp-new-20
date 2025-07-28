@@ -15,14 +15,24 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("my-release-key.jks") // Path to your keystore file
+            storePassword "1994@bhi"             // Your keystore password
+            keyAlias "my-key-alias"                           // Your key alias (e.g., "mykey")
+            keyPassword "1994@bhi"                     // Your key password
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release    // Attach signing config here
         }
     }
 
-    // FIX: Set Java & Kotlin JVM target to 17
+    // Set Java & Kotlin JVM target to 17
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -35,18 +45,16 @@ android {
 
 dependencies {
    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+   implementation 'androidx.appcompat:appcompat:1.6.1'
+   implementation 'com.google.android.material:material:1.10.0'
+   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // Location Services
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
-    implementation 'com.google.android.gms:play-services-ads:22.2.0' // latest version
+   // Location Services
+   implementation 'com.google.android.gms:play-services-location:21.0.1'
+   implementation 'com.google.android.gms:play-services-ads:22.2.0' // latest version
 
+   // Google Maps Utils for LatLng
+   implementation 'com.google.maps.android:android-maps-utils:3.8.2'
 
-    // Google Maps Utils for LatLng
-    implementation 'com.google.maps.android:android-maps-utils:3.8.2'
-
-    implementation "com.airbnb.android:lottie:6.1.0"
-
+   implementation "com.airbnb.android:lottie:6.1.0"
 }
