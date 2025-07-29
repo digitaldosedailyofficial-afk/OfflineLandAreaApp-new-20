@@ -1,5 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Offline Land Area App</string>
-    <string name="admob_app_id">ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy</string>
+
+    <string name="admob_app_id">ca-app-pub-2783895180616148~3987751356</string>
     <string name="banner_ad_unit_id">ca-app-pub-2783895180616148/9567381099</string>
-</resources>
+    <string name="background_image_description">Background image</string>
+    </resources>
