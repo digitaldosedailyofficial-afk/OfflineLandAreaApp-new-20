@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootLayout"
+    xmlns:ads="http://schemas.google.com/apk/res-auto" android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -58,6 +58,7 @@
             android:gravity="center"
             android:lineSpacingExtra="6dp"
             android:text="Press Start to measure area"
+            android:visibility="visible"
             tools:text="Area: 1.5 acres 20 Guntha (6000 sq.m)" />
 
         <TextView
@@ -84,8 +85,10 @@
         android:clickable="true"
         android:focusable="true"
         android:visibility="visible"
-        app:backgroundTint="@color/material_green" app:tint="@color/white"
-        app:srcCompat="@drawable/ic_play_arrow" app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@color/material_green"
+        app:tint="@color/white"
+        app:srcCompat="@drawable/ic_play_arrow"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/adView"
         app:layout_constraintVertical_bias="0.8" /> <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -98,7 +101,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/white"
-        app:hideOnScroll="true">
+        app:hideOnScroll="true"
+        android:visibility="gone" tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -108,33 +112,43 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
                 android:text="Pause"
-                app:icon="@drawable/ic_pause" app:iconTint="@color/white"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
+                app:icon="@drawable/ic_pause"
+                app:iconTint="@color/white"
                 android:visibility="gone"
-                app:backgroundTint="@color/material_orange" /> <com.google.android.material.button.MaterialButton
+                app:backgroundTint="@color/material_orange" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnResume"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="Resume"
-                app:icon="@drawable/ic_play_arrow" app:iconTint="@color/white"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
+                app:icon="@drawable/ic_play_arrow"
+                app:iconTint="@color/white"
                 android:visibility="gone"
-                app:backgroundTint="@color/material_blue" /> <com.google.android.material.button.MaterialButton
+                app:backgroundTint="@color/material_blue" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStop"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Stop"
-                app:icon="@drawable/ic_stop" app:iconTint="@color/white"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:text="Stop"
+                app:icon="@drawable/ic_stop"
+                app:iconTint="@color/white"
                 android:visibility="gone"
-                app:backgroundTint="@color/material_red" /> </LinearLayout>
+                app:backgroundTint="@color/material_red" />
+        </LinearLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.gms.ads.AdView

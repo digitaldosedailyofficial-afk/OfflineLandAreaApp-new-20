@@ -1,11 +1,11 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android' // Changed from 'kotlin-android' for newer Gradle versions
 }
 
 android {
     namespace 'com.abhipatil.offlinelandareaapp'
-    compileSdk 34
+    compileSdk 34 // Keep compileSdk at 34 as requested
 
     defaultConfig {
         applicationId "com.abhipatil.offlinelandareaapp"
@@ -13,14 +13,19 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
+            // IMPORTANT: For production apps, store these credentials securely,
+            // e.g., in environment variables or a separate properties file,
+            // NOT directly in build.gradle. This is for demonstration.
             storeFile file("my-release-key.jks") // Path to your keystore file
             storePassword "1994@bhi"             // Your keystore password
-            keyAlias "my-key-alias"                           // Your key alias (e.g., "mykey")
-            keyPassword "1994@bhi"                     // Your key password
+            keyAlias "my-key-alias"              // Your key alias (e.g., "mykey")
+            keyPassword "1994@bhi"               // Your key password
         }
     }
 
@@ -29,6 +34,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release    // Attach signing config here
+        }
+        debug {
+            // Optional: You can add a debug signing config here if needed
+            // For now, it will use the default debug keystore
         }
     }
 
@@ -41,20 +50,40 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    // ViewBinding is often useful with modern Android development
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
-   implementation 'androidx.core:core-ktx:1.12.0'
-   implementation 'androidx.appcompat:appcompat:1.6.1'
-   implementation 'com.google.android.material:material:1.10.0'
-   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // Core KTX for Kotlin extensions
+    implementation 'androidx.core:core-ktx:1.12.0'
+    // AppCompat for backward compatibility
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    // Material Design components - UPDATED TO A RECENT STABLE VERSION
+    // This is crucial for MaterialCardView, FloatingActionButton, BottomAppBar, MaterialButton
+    implementation 'com.google.android.material:material:1.12.0' // Using 1.12.0 as it's a recent stable version
 
-   // Location Services
-   implementation 'com.google.android.gms:play-services-location:21.0.1'
-   implementation 'com.google.android.gms:play-services-ads:22.2.0' // latest version
+    // ConstraintLayout for flexible UI layouts
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-   // Google Maps Utils for LatLng
-   implementation 'com.google.maps.android:android-maps-utils:3.8.2'
+    // Google Location Services for FusedLocationProviderClient
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    // Google Mobile Ads SDK for AdMob
+    implementation 'com.google.android.gms:play-services-ads:22.2.0'
 
-   implementation "com.airbnb.android:lottie:6.1.0"
+    // Google Maps Utils for LatLng - This is for utility functions, not for displaying maps directly
+    // If you plan to add a map, you'll need 'com.google.android.gms:play-services-maps' as well.
+    implementation 'com.google.maps.android:android-maps-utils:3.8.2'
+
+    // Lottie for animations (if you plan to use them for the walking icon or other elements)
+    implementation "com.airbnb.android:lottie:6.1.0"
+
+    // Unit tests
+    testImplementation 'junit:junit:4.13.2'
+    // Instrumentation tests
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
