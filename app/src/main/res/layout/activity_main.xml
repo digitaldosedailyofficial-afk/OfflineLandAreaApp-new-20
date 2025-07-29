@@ -1,110 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-    <!-- Background image -->
     <ImageView
         android:id="@+id/backgroundImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/background_land" />
-
-    <!-- Main content - Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:src="@drawable/background_land"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/background_image_description" /> <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center"
-        android:layout_gravity="top">
+        android:background="?attr/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Land Area Calculator"
+            app:titleTextColor="@color/white" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <Button
-            android:id="@+id/btnPause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pause"
-            android:layout_marginStart="8dp"
-            android:visibility="gone"
-            android:backgroundTint="#FF9800"
-            android:textColor="#FFFFFF" />
-
-        <Button
-            android:id="@+id/btnResume"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Resume"
-            android:layout_marginStart="8dp"
-            android:visibility="gone"
-            android:backgroundTint="#2196F3"
-            android:textColor="#FFFFFF" />
-
-        <Button
-            android:id="@+id/btnStop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stop"
-            android:layout_marginStart="8dp"
-            android:visibility="gone"
-            android:backgroundTint="#F44336"
-            android:textColor="#FFFFFF" />
-    </LinearLayout>
-
-    <!-- Walking message -->
-    <TextView
-        android:id="@+id/walkingMessage"
-        android:layout_width="wrap_content"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/infoCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Now you start walking 🚶‍♂️"
-        android:textSize="18sp"
-        android:textColor="@android:color/white"
-        android:background="#AA000000"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_marginTop="80dp" />
-
-    <!-- Result Text - For displaying calculated area -->
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Press Start to measure area"
-        android:padding="16dp"
-        android:textSize="20sp"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:background="#DDFFFFFF"
-        android:elevation="4dp"
-        android:visibility="visible"
-        android:gravity="center"
         android:layout_marginHorizontal="24dp"
-        android:lineSpacingExtra="4dp"
-        android:layout_marginBottom="60dp"
-        android:singleLine="true"   
-        android:ellipsize="end"     
-        />
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
+        app:layout_constraintVertical_bias="0.3"> <TextView
+            android:id="@+id/resultText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:text="Press Start to measure area"
+            tools:text="Area: 1.5 acres 20 Guntha (6000 sq.m)" />
 
-    <!-- AdView (Google AdMob Banner) -->
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/walkingMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:lineSpacingExtra="6dp"
+            android:text="Now you start walking 🚶‍♂️"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="visible"
+        app:backgroundTint="@color/material_green" app:tint="@color/white"
+        app:srcCompat="@drawable/ic_play_arrow" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adView"
+        app:layout_constraintVertical_bias="0.8" /> <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        app:fabAlignmentMode="center"
+        app:fabAnimationMode="slide"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/white"
+        app:hideOnScroll="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pause"
+                app:icon="@drawable/ic_pause" app:iconTint="@color/white"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                app:backgroundTint="@color/material_orange" /> <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnResume"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resume"
+                app:icon="@drawable/ic_play_arrow" app:iconTint="@color/white"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                app:backgroundTint="@color/material_blue" /> <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                app:icon="@drawable/ic_stop" app:iconTint="@color/white"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                app:backgroundTint="@color/material_red" /> </LinearLayout>
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-2783895180616148/9567381099" />
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
