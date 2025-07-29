@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
@@ -15,17 +16,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.text.HtmlCompat
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize // Import AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.location.*
-import com.google.android.material.appbar.MaterialToolbar // Import MaterialToolbar
-import com.google.android.material.bottomappbar.BottomAppBar // Import BottomAppBar
-import com.google.android.material.button.MaterialButton // Import MaterialButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton // Import FloatingActionButton
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.math.abs
 import kotlin.math.cos
-import android.os.Handler
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,14 +44,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adView: AdView
 
     // UI elements - Updated to Material Design components
-    private lateinit var fabStart: FloatingActionButton // Changed from Button to FloatingActionButton
-    private lateinit var btnPause: MaterialButton       // Changed from Button to MaterialButton
-    private lateinit var btnResume: MaterialButton      // Changed from Button to MaterialButton
-    private lateinit var btnStop: MaterialButton        // Changed from Button to MaterialButton
+    private lateinit var fabStart: FloatingActionButton
+    private lateinit var btnPause: MaterialButton
+    private lateinit var btnResume: MaterialButton
+    private lateinit var btnStop: MaterialButton
     private lateinit var walkingMsg: TextView
     private lateinit var resultText: TextView
-    private lateinit var toolbar: MaterialToolbar       // Added Toolbar reference
-    private lateinit var bottomAppBar: BottomAppBar     // Added BottomAppBar reference
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var bottomAppBar: BottomAppBar
 
     // LocationCallback for receiving location updates
     private lateinit var locationCallback: LocationCallback
@@ -72,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         btnStop = findViewById(R.id.btnStop)
         walkingMsg = findViewById(R.id.walkingMessage)
         resultText = findViewById(R.id.resultText)
-        toolbar = findViewById(R.id.toolbar) // Initialize the toolbar
-        bottomAppBar = findViewById(R.id.bottomAppBar) // Initialize the bottom app bar
+        toolbar = findViewById(R.id.toolbar)
+        bottomAppBar = findViewById(R.id.bottomAppBar)
 
         // Set the toolbar as the activity's action bar
         setSupportActionBar(toolbar)
@@ -135,10 +136,28 @@ class MainActivity : AppCompatActivity() {
             updateButtonVisibility() // Update button visibility after calculation
         }
 
-        // Initialize Mobile Ads SDK
+        // --- ADMOB INITIALIZATION AND FIX ---
+        // Initialize Mobile Ads SDK (recommended to do this once per app, e.g., in Application class)
         MobileAds.initialize(this) {}
+
         adView = findViewById(R.id.adView)
+
+        // *** THE FIX: Explicitly set ad unit ID and ad size before calling loadAd ***
+
+        // 1. Set Ad Unit ID
+        // IMPORTANT: Replace "@string/banner_ad_unit_id" with your actual AdMob banner ad unit ID.
+        // During development, use a test ad unit ID: "ca-app-pub-3940256099942544/6300978111"
+        adView.adUnitId = getString(R.string.banner_ad_unit_id)
+
+        // 2. Set Ad Size
+        // This explicitly sets the ad size. Common sizes include AdSize.BANNER, AdSize.LARGE_BANNER, etc.
+        // Use AdSize.BANNER for standard banners.
+        adView.setAdSize(AdSize.BANNER)
+
+        // Create an AdRequest
         val adRequest = AdRequest.Builder().build()
+
+        // Load the ad
         adView.loadAd(adRequest)
 
         // Add AdListener for debugging ad loading
@@ -146,11 +165,13 @@ class MainActivity : AppCompatActivity() {
             override fun onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
                 Log.d("AdMob", "Ad loaded successfully!")
+                Toast.makeText(this@MainActivity, "Ad loaded!", Toast.LENGTH_SHORT).show()
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 // Code to be executed when an ad request fails.
-                Log.e("AdMob", "Ad failed to load: ${adError.message}")
+                Log.e("AdMob", "Ad failed to load: ${adError.message} (Code: ${adError.code})")
+                Toast.makeText(this@MainActivity, "Ad failed to load: ${adError.message}", Toast.LENGTH_LONG).show()
             }
 
             override fun onAdOpened() {
@@ -168,6 +189,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("AdMob", "Ad closed")
             }
         }
+        // --- END ADMOB INITIALIZATION AND FIX ---
+
 
         // Define the LocationCallback
         locationCallback = object : LocationCallback() {
@@ -356,7 +379,7 @@ class MainActivity : AppCompatActivity() {
         } else { // When not tracking (initial state or after stop)
             fabStart.visibility = View.VISIBLE // Show FAB for new measurement
             bottomAppBar.visibility = View.GONE // Hide BottomAppBar
-            btnPause.visibility = View.GONE     // Ensure individual buttons are hidden too
+            btnPause.visibility = View.GONE      // Ensure individual buttons are hidden too
             btnResume.visibility = View.GONE
             btnStop.visibility = View.GONE
             // resultText visibility is handled by calculateAndShowArea() or initial setup.

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Offline Land Area App</string>
-    <string name="background_image_description">Background image of a land field</string>
-    </resources>
+    <string name="admob_app_id">ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy</string>
+    <string name="banner_ad_unit_id">ca-app-pub-2783895180616148/9567381099</string>
+</resources>
