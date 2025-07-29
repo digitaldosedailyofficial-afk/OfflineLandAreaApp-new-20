@@ -142,16 +142,11 @@ class MainActivity : AppCompatActivity() {
 
         adView = findViewById(R.id.adView)
 
-        // *** THE FIX: Explicitly set ad unit ID and ad size before calling loadAd ***
+        // *** THE FIX: REMOVE THE DUPLICATE AD_UNIT_ID SETTING ***
+        // adView.adUnitId = getString(R.string.banner_ad_unit_id) // REMOVED THIS LINE
 
-        // 1. Set Ad Unit ID
-        // IMPORTANT: Replace "@string/banner_ad_unit_id" with your actual AdMob banner ad unit ID.
-        // During development, use a test ad unit ID: "ca-app-pub-3940256099942544/6300978111"
-        adView.adUnitId = getString(R.string.banner_ad_unit_id)
-
-        // 2. Set Ad Size
-        // This explicitly sets the ad size. Common sizes include AdSize.BANNER, AdSize.LARGE_BANNER, etc.
-        // Use AdSize.BANNER for standard banners.
+        // It's still good to explicitly set Ad Size here for programmatic clarity,
+        // although it's also in XML. It doesn't cause a conflict.
         adView.setAdSize(AdSize.BANNER)
 
         // Create an AdRequest

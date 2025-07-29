@@ -93,7 +93,8 @@
         app:tint="@color/white"
         app:srcCompat="@drawable/ic_play_arrow"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"  app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
         android:layout_marginBottom="16dp" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -116,7 +117,9 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="16dp"> <com.google.android.material.button.MaterialButton
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
