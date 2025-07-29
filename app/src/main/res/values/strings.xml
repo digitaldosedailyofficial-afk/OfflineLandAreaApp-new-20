@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Land Area Calculate</string>
-</resources>
+    <string name="app_name">Offline Land Area App</string>
+    <string name="background_image_description">Background image of a land field</string>
+    </resources>
