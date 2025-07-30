@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             tracking = true
             paused = false
             // Updated walking message with dots
-            walkingMsg.text = "--- Now you start walking 🚶‍♂️ ---"
+            walkingMsg.text = " Now you start walking 🚶‍♂️ "
             walkingMsg.visibility = View.VISIBLE
             resultText.visibility = View.GONE // Hide result text when tracking starts
             Toast.makeText(this, "Now you start walking 🚶‍♂️", Toast.LENGTH_SHORT).show()
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         // Button: Resume Tracking
         btnResume.setOnClickListener {
             paused = false
-            walkingMsg.text = "--- Now you start walking 🚶‍♂️ ---" // Updated walking message
+            walkingMsg.text = " Now you start walking 🚶 " // Updated walking message
             Toast.makeText(this, "Tracking Resumed", Toast.LENGTH_SHORT).show()
             updateButtonVisibility()
             // If resuming, and the text was previously hidden, show the full text again briefly
