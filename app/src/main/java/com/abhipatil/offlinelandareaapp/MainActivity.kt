@@ -142,11 +142,9 @@ class MainActivity : AppCompatActivity() {
 
         adView = findViewById(R.id.adView)
 
-        // *** THE FIX: REMOVE THE DUPLICATE AD_UNIT_ID SETTING ***
-        // adView.adUnitId = getString(R.string.banner_ad_unit_id) // REMOVED THIS LINE
-
-        // It's still good to explicitly set Ad Size here for programmatic clarity,
-        // although it's also in XML. It doesn't cause a conflict.
+        // *** FIX: Set Ad Unit ID and Ad Size programmatically here ***
+        // This ensures they are set before loadAd() and prevents duplicate settings from XML.
+        adView.adUnitId = getString(R.string.banner_ad_unit_id)
         adView.setAdSize(AdSize.BANNER)
 
         // Create an AdRequest
