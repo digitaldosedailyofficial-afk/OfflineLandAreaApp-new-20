@@ -16,7 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.text.HtmlCompat
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize // Import AdSize
+import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     data class LatLng(val latitude: Double, val longitude: Double)
 
     // FusedLocationProviderClient for location services
-    private lateinit var fusedLocationClient: FusedLocationClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient // Corrected type: FusedLocationProviderClient
     // List to store location points
     private val points = mutableListOf<LatLng>()
     // Tracking state variables
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             points.clear() // Clear previous points for a new measurement
             tracking = true
             paused = false
-            // Updated walking message
+            // Updated walking message with dots
             walkingMsg.text = "--- Now you start walking 🚶‍♂️ ---"
             walkingMsg.visibility = View.VISIBLE
             resultText.visibility = View.GONE // Hide result text when tracking starts
@@ -143,10 +143,9 @@ class MainActivity : AppCompatActivity() {
 
         adView = findViewById(R.id.adView)
 
-        // FIX: AdUnitId is set here (as before)
+        // The adUnitId is set programmatically as discussed.
+        // adSize is now handled directly in XML (activity_main.xml) to resolve the "missing" attribute error.
         adView.adUnitId = getString(R.string.banner_ad_unit_id)
-        // FIX: Removed adView.setAdSize(AdSize.BANNER) as it's now specified in XML
-        // Setting it in XML addresses the "Required XML attribute "adSize" was missing" error.
 
         // Create an AdRequest
         val adRequest = AdRequest.Builder().build()
