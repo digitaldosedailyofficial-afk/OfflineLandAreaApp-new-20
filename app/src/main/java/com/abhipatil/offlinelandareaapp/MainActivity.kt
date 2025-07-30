@@ -16,11 +16,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.text.HtmlCompat
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.location.*
+import com.google.android.gms.location.* // Corrected import for FusedLocationProviderClient
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.button.MaterialButton
@@ -34,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     data class LatLng(val latitude: Double, val longitude: Double)
 
     // FusedLocationProviderClient for location services
-    private lateinit var fusedLocationClient: FusedLocationProviderClient // Corrected type: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient // Corrected type here
     // List to store location points
     private val points = mutableListOf<LatLng>()
     // Tracking state variables
@@ -137,15 +136,16 @@ class MainActivity : AppCompatActivity() {
             updateButtonVisibility() // Update button visibility after calculation
         }
 
-        // --- ADMOB INITIALIZATION AND FIX ---
-        // Initialize Mobile Ads SDK (recommended to do this once per app, e.g., in Application class)
+        // --- ADMOB INITIALIZATION (FINAL FIX) ---
         MobileAds.initialize(this) {}
 
         adView = findViewById(R.id.adView)
 
-        // The adUnitId is set programmatically as discussed.
-        // adSize is now handled directly in XML (activity_main.xml) to resolve the "missing" attribute error.
-        adView.adUnitId = getString(R.string.banner_ad_unit_id)
+        // IMPORTANT FIX: AdSize and AdUnitId are now set *only* in activity_main.xml.
+        // Remove any programmatic setting of these here to avoid IllegalStateException.
+        // The attributes in XML (app:adSize and app:adUnitId) correctly configure the AdView.
+        // adView.adUnitId = getString(R.string.banner_ad_unit_id) // REMOVED
+        // adView.setAdSize(AdSize.BANNER) // REMOVED
 
         // Create an AdRequest
         val adRequest = AdRequest.Builder().build()
@@ -156,33 +156,28 @@ class MainActivity : AppCompatActivity() {
         // Add AdListener for debugging ad loading
         adView.adListener = object : AdListener() {
             override fun onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
                 Log.d("AdMob", "Ad loaded successfully!")
                 Toast.makeText(this@MainActivity, "Ad loaded!", Toast.LENGTH_SHORT).show()
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                // Code to be executed when an ad request fails.
                 Log.e("AdMob", "Ad failed to load: ${adError.message} (Code: ${adError.code})")
                 Toast.makeText(this@MainActivity, "Ad failed to load: ${adError.message}", Toast.LENGTH_LONG).show()
             }
 
             override fun onAdOpened() {
-                // Code to be executed when an ad opens an overlay that covers the screen.
                 Log.d("AdMob", "Ad opened")
             }
 
             override fun onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
                 Log.d("AdMob", "Ad clicked")
             }
 
             override fun onAdClosed() {
-                // Code to be executed when the user is about to return to the app after clicking on an ad.
                 Log.d("AdMob", "Ad closed")
             }
         }
-        // --- END ADMOB INITIALIZATION AND FIX ---
+        // --- END ADMOB INITIALIZATION ---
 
 
         // Define the LocationCallback
@@ -302,16 +297,14 @@ class MainActivity : AppCompatActivity() {
         val gunthaExact = area / 101.17 // 1 guntha = 101.17 sq.m
         val gunthaRounded = gunthaExact.toInt()
 
+        // Ensure "message in one line please" is handled by textSize in XML
         val displayText = if (areaInAcre < 1) {
             if (gunthaRounded > 0) {
-                // Display Guntha directly if less than 1 acre
                 "<b><font color='black'>Area: $gunthaRounded Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
             } else {
-                // Handle very small areas less than 1 Guntha
                 "<b><font color='black'>Area: Less than 1 Guntha</font></b> (<font color='black'>${area.toInt()} sq.m</font>)"
             }
         } else {
-            // Calculate acres and remaining guntha for areas >= 1 acre
             val acresPart = areaInAcre.toInt()
             val leftoverSqm = area - (acresPart * 4046.86)
             val leftoverGuntha = (leftoverSqm / 101.17).toInt()
