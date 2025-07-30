@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     data class LatLng(val latitude: Double, val longitude: Double)
 
     // FusedLocationProviderClient for location services
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var fusedLocationClient: FusedLocationClient
     // List to store location points
     private val points = mutableListOf<LatLng>()
     // Tracking state variables
@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
             points.clear() // Clear previous points for a new measurement
             tracking = true
             paused = false
-            walkingMsg.text = "Now you start walking 🚶‍♂️" // Initial text with symbol
+            // Updated walking message
+            walkingMsg.text = "--- Now you start walking 🚶‍♂️ ---"
             walkingMsg.visibility = View.VISIBLE
             resultText.visibility = View.GONE // Hide result text when tracking starts
             Toast.makeText(this, "Now you start walking 🚶‍♂️", Toast.LENGTH_SHORT).show()
@@ -98,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             // Hide "Now you start walking" text after 5 seconds, leaving only the symbol
             Handler(Looper.getMainLooper()).postDelayed({
                 if (tracking && !paused) { // Only change if still tracking and not paused
-                    walkingMsg.text = "🚶‍♂️"
+                    walkingMsg.text = "🚶‍♂️🚶‍♂️🚶‍♂️" // Changed to multiple emojis for better visual
                 }
             }, 5000) // 5000 milliseconds = 5 seconds
         }
@@ -114,13 +115,13 @@ class MainActivity : AppCompatActivity() {
         // Button: Resume Tracking
         btnResume.setOnClickListener {
             paused = false
-            walkingMsg.text = "Now you start walking 🚶‍♂️"
+            walkingMsg.text = "--- Now you start walking 🚶‍♂️ ---" // Updated walking message
             Toast.makeText(this, "Tracking Resumed", Toast.LENGTH_SHORT).show()
             updateButtonVisibility()
             // If resuming, and the text was previously hidden, show the full text again briefly
             Handler(Looper.getMainLooper()).postDelayed({
                 if (tracking && !paused) {
-                    walkingMsg.text = "🚶‍♂️"
+                    walkingMsg.text = "🚶‍♂️🚶‍♂️🚶‍♂️" // Changed to multiple emojis for better visual
                 }
             }, 5000)
         }
@@ -142,10 +143,10 @@ class MainActivity : AppCompatActivity() {
 
         adView = findViewById(R.id.adView)
 
-        // *** FIX: Set Ad Unit ID and Ad Size programmatically here ***
-        // This ensures they are set before loadAd() and prevents duplicate settings from XML.
+        // FIX: AdUnitId is set here (as before)
         adView.adUnitId = getString(R.string.banner_ad_unit_id)
-        adView.setAdSize(AdSize.BANNER)
+        // FIX: Removed adView.setAdSize(AdSize.BANNER) as it's now specified in XML
+        // Setting it in XML addresses the "Required XML attribute "adSize" was missing" error.
 
         // Create an AdRequest
         val adRequest = AdRequest.Builder().build()

@@ -49,18 +49,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
-        app:layout_constraintVertical_bias="0.3">
-
-        <TextView
+        app:layout_constraintVertical_bias="0.55"> <TextView
             android:id="@+id/resultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            android:textSize="22sp"
-            android:textColor="@color/black"
+            android:textSize="20sp" android:textColor="@color/black"
             android:textStyle="bold"
             android:gravity="center"
-            android:lineSpacingExtra="6dp"
+            android:singleLine="false" android:ellipsize="end" android:lineSpacingExtra="6dp"
             android:text="Press Start to measure area"
             android:visibility="visible"
             tools:text="Area: 1.5 acres 20 Guntha (6000 sq.m)" />
@@ -94,10 +91,9 @@
         app:srcCompat="@drawable/ic_play_arrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoCard"
         app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
-        android:layout_marginBottom="16dp" />
-
-    <com.google.android.material.bottomappbar.BottomAppBar
+        app:layout_constraintVertical_bias="0.8" /> <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -117,9 +113,7 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="16dp">
-
-            <com.google.android.material.button.MaterialButton
+            android:paddingBottom="0dp"> <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -167,4 +161,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        /> </androidx.constraintlayout.widget.ConstraintLayout>
+        app:adSize="BANNER" app:adUnitId="ca-app-pub-2783895180616148/9567381099" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
