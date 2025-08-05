@@ -49,33 +49,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
-        app:layout_constraintVertical_bias="0.55"> <TextView
-            android:id="@+id/resultText"
+        app:layout_constraintVertical_bias="0.55">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:textSize="20sp" android:textColor="@color/black"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:singleLine="false" android:ellipsize="end" android:lineSpacingExtra="6dp"
-            android:text="Press Start to measure area"
-            android:visibility="visible"
-            tools:text="Area: 1.5 acres 20 Guntha (6000 sq.m)" />
+            android:padding="20dp">
 
-        <TextView
-            android:id="@+id/walkingMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:textSize="22sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:lineSpacingExtra="6dp"
-            android:text="Now you start walking 🚶‍♂️"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            <TextView
+                android:id="@+id/mainResultText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="26sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:text="Press Start to measure area"
+                tools:text="1.5 acres 20 Guntha" />
 
+            <TextView
+                android:id="@+id/secondaryResultText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray"
+                android:gravity="center"
+                android:textStyle="normal"
+                tools:text="(6000 sq.m)" />
+
+            <TextView
+                android:id="@+id/walkingMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:text="Now you start walking 🚶‍♂️"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -93,7 +111,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/infoCard"
         app:layout_constraintBottom_toTopOf="@id/bottomAppBar"
-        app:layout_constraintVertical_bias="0.8" /> <com.google.android.material.bottomappbar.BottomAppBar
+        app:layout_constraintVertical_bias="0.8" />
+
+    <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -113,7 +133,9 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="0dp"> <com.google.android.material.button.MaterialButton
+            android:paddingBottom="0dp">
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPause"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -162,4 +184,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:adSize="BANNER"
-        app:adUnitId="@string/banner_ad_unit_id" /> </androidx.constraintlayout.widget.ConstraintLayout>
+        app:adUnitId="@string/banner_ad_unit_id" />
+</androidx.constraintlayout.widget.ConstraintLayout>
